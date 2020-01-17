@@ -44,8 +44,28 @@ class TT(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pid = models.CharField(max_length=10)
+    semsec = models.CharField(max_length=2)
     class Meta:
       db_table = "Profile"
     def __str__(self):
-        return self.pid
+        return self.semsec
+
+class Attendance(models.Model):
+  user = models.ForeignKey(User,models.CASCADE,related_name='Attendance')
+  subject = models.ForeignKey(Subject,models.CASCADE,related_name='Attendance')
+  per = models.IntegerField()
+  class Meta:
+      db_table = "Attendance"
+  def __str__(self):
+      return self.user.username+"-"+self.subject.subname+"-"+str(self.per)
+
+class Marks(models.Model):
+  user = models.ForeignKey(User,models.CASCADE,related_name='Marks')
+  subject = models.ForeignKey(Subject,models.CASCADE,related_name='Marks')
+  Test1 = models.IntegerField(default=None, blank=True, null=True)
+  Test2 = models.IntegerField(default=None, blank=True, null=True)
+  Test3 = models.IntegerField(default=None, blank=True, null=True)
+  class Meta:
+      db_table = "Marks"
+  def __str__(self):
+      return self.user.username+"-"+self.subject.subname+"-"+str(self.Test1)+"-"+str(self.Test2)+"-"+str(self.Test3)
