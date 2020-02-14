@@ -45,6 +45,7 @@ class TT(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     semsec = models.CharField(max_length=2)
+    batch = models.CharField(max_length=2)
     class Meta:
       db_table = "Profile"
     def __str__(self):
@@ -69,3 +70,16 @@ class Marks(models.Model):
       db_table = "Marks"
   def __str__(self):
       return self.user.username+"-"+self.subject.subname+"-"+str(self.Test1)+"-"+str(self.Test2)+"-"+str(self.Test3)
+
+class LAB(models.Model):
+    day = models.CharField(max_length=3)
+    subject = models.ForeignKey(Subject,models.CASCADE,related_name='LAB')
+    faculty1 = models.ForeignKey(Faculty,models.CASCADE,related_name='LAB1')
+    faculty2 = models.ForeignKey(Faculty,models.CASCADE,related_name='LAB2')
+    slot = models.ForeignKey(Slot,models.CASCADE,related_name='LAB')
+    semsec = models.CharField(max_length=2)
+    batch = models.CharField(max_length=2)
+    class Meta:
+      db_table = "LAB"
+    def __str__(self):
+        return self.day+":"+self.slot.time+":"+self.subject.subname

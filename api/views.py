@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from api.models import TT,Faculty,Slot,Subject,Attendance,Marks
+from api.models import TT,Faculty,Slot,Subject,Attendance,Marks,LAB
 # Create your views here.
 class getTT(APIView):
     permission_classes = (IsAuthenticated,)
@@ -81,3 +81,44 @@ class getMarks(APIView):
         for mark in Marks.objects.filter(user__username=self.request.user.username):
             result[mark.subject.subcode] = [mark.Test1,mark.Test2,mark.Test3]
         return Response(result)
+
+
+class getLAB(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        result = {}
+        pid = request.user.username
+        if(len(pid)==10):
+            batch = self.request.user.profile.batch
+            days = ['MON','TUE','WED','THU','FRI','SAT']
+            for day in days:
+                subs = LAB.objects.filter(batch=batch,day=day)
+                subl = []
+                for sub in subs:
+                    subr = {
+                        "subcode":sub.subject.subcode,
+                        "subname":sub.subject.subname,
+                        "faculty1":sub.faculty1.name,
+                        "faculty2":sub.faculty2.name,
+                        "slot":sub.slot.time,
+                    }
+                    subl.append(subr)
+                result[day]=subl
+            return Response(result)
+        else:
+            days = ['MON','TUE','WED','THU','FRI','SAT']
+            for day in days:
+                subs = LAB.objects.filter(faculty1__fid=pid,day=day) | LAB.objects.filter(faculty2__fid=pid,day=day)
+                subl = []
+                for sub in subs:
+                    subr = {
+                        "subcode":sub.subject.subcode,
+                        "subname":sub.subject.subname,
+                        "faculty1":sub.faculty1.name,
+                        "faculty2":sub.faculty2.name,
+                        "slot":sub.slot.time,
+                    }
+                    subl.append(subr)
+                result[day]=subl
+            return Response(result)
