@@ -8,7 +8,7 @@ class getTT(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        result = {}
+        result = []
         pid = request.user.username
         if(len(pid)==10):
             semsec = self.request.user.profile.semsec
@@ -25,7 +25,7 @@ class getTT(APIView):
                         "room":sub.room
                     }
                     subl.append(subr)
-                result[day]=subl
+                result.append(subl)
             return Response(result)
         else:
             days = ['MON','TUE','WED','THU','FRI','SAT']
@@ -68,18 +68,26 @@ class getAttendance(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self,request):
-        result = {}
+        result = []
         for attend in Attendance.objects.filter(user__username=self.request.user.username):
-            result[attend.subject.subcode] = attend.per
+            res = {
+                "subcode" : attend.subject.subcode,
+                "per" : attend.per
+            }
+            result.append(res)
         return Response(result)
 
 class getMarks(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self,request):
-        result = {}
+        result = []
         for mark in Marks.objects.filter(user__username=self.request.user.username):
-            result[mark.subject.subcode] = [mark.Test1,mark.Test2,mark.Test3]
+            res ={
+                'subcode':mark.subject.subcode,
+                'marks':[mark.Test1,mark.Test2,mark.Test3]
+            }
+            result.append(res)
         return Response(result)
 
 
@@ -87,7 +95,7 @@ class getLAB(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        result = {}
+        result = []
         pid = request.user.username
         if(len(pid)==10):
             batch = self.request.user.profile.batch
@@ -104,7 +112,7 @@ class getLAB(APIView):
                         "slot":sub.slot.time,
                     }
                     subl.append(subr)
-                result[day]=subl
+                result.append(subl)
             return Response(result)
         else:
             days = ['MON','TUE','WED','THU','FRI','SAT']
